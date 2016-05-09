@@ -34,3 +34,15 @@ direction d dur f t
 
 delay :: Time -> Rollercoaster -> Rollercoaster
 delay t r f t' = r (\_ -> f t') (max (t' - t) 0)
+
+forever :: Rollercoaster -> Rollercoaster
+forever r = r <> forever r
+
+loop :: Time -> Double -> Rollercoaster 
+loop dur r f t
+    | t < dur = case f t of
+                    Going cv    -> Going (muld cv (r*(sin (2*pi*t/dur)), 0, r-r*(cos (2*pi*t/dur))) 1)
+                    Done  t' cv -> Going (muld cv (r*(sin (2*pi*t/dur)), 0, r-r*(cos (2*pi*t/dur))) 1)
+    | otherwise = case f t of
+                    Going cv   -> Going cv
+                    Done t' cv -> Done (min t' (t - dur)) cv
