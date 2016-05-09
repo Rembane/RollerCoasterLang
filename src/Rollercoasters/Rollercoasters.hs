@@ -1,13 +1,14 @@
+import Prelude hiding (repeat)
 
-type Vector3 = (Double, Double, Double)
+type Vector3       = (Double, Double, Double)
 
-type Coordinate = Vector3
+type Coordinate    = Vector3
 
-type Viewvector = Vector3
+type Viewvector    = Vector3
 
-type Time = Double
+type Time          = Double
 
-data Result = Going (Coordinate, Viewvector) | Done Time (Coordinate, Viewvector) deriving (Show)
+data Result        = Going (Coordinate, Viewvector) | Done Time (Coordinate, Viewvector) deriving (Show)
 
 type Rollercoaster = (Time -> Result) -> (Time -> Result)
 
@@ -25,7 +26,7 @@ start t = Done t ((0, 0, 0), (0, 0, 0))
 
 direction :: Vector3 -> Time -> Rollercoaster
 direction d dur f t
-    | t < dur = case f t of
+    | t < dur   = case f t of
                     Going cv   -> Going (muld cv d t) 
                     Done t' cv -> Going (muld cv d t)
     | otherwise = case f t of
@@ -40,9 +41,13 @@ forever r = r <> forever r
 
 loop :: Time -> Double -> Rollercoaster 
 loop dur r f t
-    | t < dur = case f t of
+    | t < dur   = case f t of
                     Going cv    -> Going (muld cv (r*(sin (2*pi*t/dur)), 0, r-r*(cos (2*pi*t/dur))) 1)
                     Done  t' cv -> Going (muld cv (r*(sin (2*pi*t/dur)), 0, r-r*(cos (2*pi*t/dur))) 1)
     | otherwise = case f t of
                     Going cv   -> Going cv
                     Done t' cv -> Done (min t' (t - dur)) cv
+
+repeat :: Int -> Rollercoaster -> Rollercoaster
+repeat 0 _ = id
+repeat n r = r <> repeat (n-1) r
