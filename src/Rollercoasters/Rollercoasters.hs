@@ -51,3 +51,10 @@ loop dur r f t
 repeat :: Int -> Rollercoaster -> Rollercoaster
 repeat 0 _ = id
 repeat n r = r <> repeat (n-1) r
+
+limit :: Time -> Rollercoaster -> Rollercoaster
+limit d r f t
+    | t <= d    = r f t
+    | otherwise = case r f d of
+                    Going cv   -> Done (t - d) cv 
+                    Done t' cv -> Done (t' + t - d) cv
