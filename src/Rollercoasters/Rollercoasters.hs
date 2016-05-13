@@ -60,3 +60,7 @@ direction d dur r t
     | otherwise = case r t of
                     Going (v, q)   -> Going (v &+ (dur *& (actU q d)), q)
                     Done t' (v, q) -> Done (min t' (t - dur)) (v &+ (dur *& (actU q d)), q)
+
+-- Rotate the point of view of the "rider" around origo
+turn :: Radians -> Time -> Rollercoaster
+turn rad dur f t = (rotate (Vec3 0 0 1) ((min dur t)*rad/dur) id) f t
