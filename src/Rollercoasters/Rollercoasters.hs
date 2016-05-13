@@ -12,6 +12,10 @@ data Result        = Going (Coordinate, UnitQuaternion) | Done Time (Coordinate,
 
 type Rollercoaster = (Time -> Result) -> (Time -> Result)
 
+instance Monoid Rollercoaster where
+    mappend = (<>)
+    mempty  = direction (Vec3 0 0 0) 0
+
 -- Sequential composition of rollercoasters
 (<>) :: Rollercoaster -> Rollercoaster -> Rollercoaster
 (<>) r r' f t = case r f t of
