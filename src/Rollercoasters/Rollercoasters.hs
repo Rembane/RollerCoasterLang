@@ -43,7 +43,7 @@ limit d r f t
 start :: Time -> Result
 start t = Done t (Vec3 0.0 0.0 0.0, unitU)
 
--- Rotate a rollercoaster
+-- Rotate the point of view of a rollercoaster
 rotate :: Vec3 -> Radians -> Rollercoaster -> Rollercoaster 
 rotate v rad r f = r rot  
     where
@@ -61,6 +61,6 @@ direction d dur r t
                     Going (v, q)   -> Going (v &+ (dur *& (actU q d)), q)
                     Done t' (v, q) -> Done (min t' (t - dur)) (v &+ (dur *& (actU q d)), q)
 
--- Rotate the point of view of the "rider" around origo
+-- Turn the point of view of the "rider" around origo
 turn :: Vec3 -> Radians -> Time -> Rollercoaster
 turn v rad dur f t = (rotate v ((min dur t)*rad/dur) id) f t
