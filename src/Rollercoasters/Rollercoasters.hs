@@ -56,7 +56,7 @@ direction :: Vec3 -> Time -> Rollercoaster
 direction d dur r t
     | t <= dur  = case r t of
                     Going (v, q)   -> Going (v &+ (t *& (actU q d)), q) 
-                    Done t' (v, q) -> Going (v &+ (t *& (actU q d)), q)
+                    Done _ (v, q) -> Going (v &+ (t *& (actU q d)), q)
     | otherwise = case r t of
                     Going (v, q)   -> Going (v &+ (dur *& (actU q d)), q)
                     Done t' (v, q) -> Done (min t' (t - dur)) (v &+ (dur *& (actU q d)), q)
