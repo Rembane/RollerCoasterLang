@@ -44,8 +44,8 @@ start :: Time -> Result
 start t = Done t (Vec3 0.0 0.0 0.0, unitU)
 
 -- Rotate the point of view of a rollercoaster
-rotate :: Vec3 -> Radians -> Rollercoaster -> Rollercoaster 
-rotate v rad r f = r rot  
+rotateView :: Vec3 -> Radians -> Rollercoaster -> Rollercoaster 
+rotateView v rad r f = r rot
     where
         rot t = case f t of
                     Going (v', q)   -> Going (v', multU q (rotU v rad))
@@ -62,5 +62,24 @@ direction d dur r t
                     Done t' (v, q) -> Done (min t' (t - dur)) (v &+ (dur *& (actU q d)), q)
 
 -- Turn the point of view of the "rider" around origo
-turn :: Vec3 -> Radians -> Time -> Rollercoaster
-turn v rad dur f t = (rotate v ((min dur t)*rad/dur) id) f t
+turn :: Vec3 -> Radians -> Time -> Rollercoaster -> Rollercoaster
+turn v rad dur r f t = (rotateView v ((min dur t)*rad/dur) r) f t
+
+-- Go around a corner
+corner :: Vec3 -> Vec3 -> Radians -> Time -> Rollercoaster
+corner p v rad dur = r
+    where
+        vec t
+            | t <= dur  = (actU (rotU v (t*rad/dur)) ((-1) *& p)) &+ p
+            | otherwise = (actU (rotU v rad) ((-1) *& p)) &+ p
+        r f t 
+            | t <= dur  = case f t of
+                            Going (v', q) -> Going (v' &+ (actU q (vec t)), multU q (rotU v (t*rad/dur)))
+                            Done t' (v', q) -> Going (v' &+ (actU q (vec t)), multU q (rotU v (t*rad/dur))) 
+            | otherwise = case f t of
+                            Going (v', q) -> Going (v' &+ (actU q (vec t)), multU q (rotU v rad))
+                            Done t' (v', q) -> Done (min t' (t-dur)) (v' &+ (actU q (vec t)), multU q (rotU v rad))
+
+-- Do the loop-the-loop
+loopTheLoop :: Float -> Float -> Time -> Rollercoaster
+loopTheLoop radius lateral t = (direction (Vec3 0 lateral 0) t) . (corner (Vec3 0 radius 0) (Vec3 0 0 (-1)) (2*pi) t)
