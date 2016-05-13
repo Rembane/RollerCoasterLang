@@ -1,3 +1,5 @@
+module Rollercoasters where
+
 import Data.Vect.Float.Base
 import Data.Vect.Float.Util.Quaternion
 import Prelude hiding (repeat)
@@ -11,10 +13,6 @@ type Time          = Float
 data Result        = Going (Coordinate, UnitQuaternion) | Done Time (Coordinate, UnitQuaternion) deriving (Show)
 
 type Rollercoaster = (Time -> Result) -> (Time -> Result)
-
-instance Monoid Rollercoaster where
-    mappend = (<>)
-    mempty  = direction (Vec3 0 0 0) 0
 
 -- Sequential composition of rollercoasters
 (<>) :: Rollercoaster -> Rollercoaster -> Rollercoaster
@@ -86,4 +84,4 @@ corner p v rad dur = r
 
 -- Do the loop-the-loop
 loopTheLoop :: Float -> Float -> Time -> Rollercoaster
-loopTheLoop radius lateral t = (direction (Vec3 0 lateral 0) t) . (corner (Vec3 0 radius 0) (Vec3 0 0 (-1)) (2*pi) t)
+loopTheLoop radius lateral t = (direction (Vec3 0 lateral 0) t) . (corner (Vec3 0 0 radius) (Vec3 0 (-1) 0) (2*pi) t)
